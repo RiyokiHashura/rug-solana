@@ -4,6 +4,7 @@ const BuyButton = ({ onRug, disabled }) => (
   <button 
     onClick={onRug}
     disabled={disabled}
+    aria-label="Buy RUG Token"
     className={`
       w-full
       px-8
