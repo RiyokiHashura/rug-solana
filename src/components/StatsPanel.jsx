@@ -98,8 +98,7 @@ const StatsPanel = ({ isRugPulled, currentPrice, isGreen }) => {
     isLarge = false,
     isAnimating = false,
     showChange = true,
-    isPriceCard = false,
-    isRugPulled = false
+    isPriceCard = false
   }) => (
     <div className={`
       relative
@@ -112,8 +111,9 @@ const StatsPanel = ({ isRugPulled, currentPrice, isGreen }) => {
       backdrop-blur-sm 
       border 
       border-rug-dark/30
-      transition-gpu
+      transition-all
       duration-300
+      ease-out
       hover:scale-[1.02]
       hover:-translate-y-0.5
       hover:border-rug-secondary/20
@@ -122,85 +122,52 @@ const StatsPanel = ({ isRugPulled, currentPrice, isGreen }) => {
       group
       cursor-default
       overflow-hidden
-      animate-gpu
+      ${isPriceCard ? 'animate-gpu' : ''}
     `}>
-      {/* Gradient overlay on hover */}
-      <div className="
-        absolute
-        inset-0
-        bg-gradient-to-br
-        from-rug-primary/5
-        via-transparent
-        to-transparent
-        opacity-0
-        group-hover:opacity-100
-        transition-opacity
-        duration-500
-      " />
-
-      {/* Content with relative positioning to stay above gradient */}
       <div className="relative z-10">
         <div className="flex justify-between items-start">
-          <div className="flex items-center gap-2 text-sm font-medium text-rug-text/70">
-            <span className={`
-              transform 
-              transition-transform 
-              duration-300
-              group-hover:scale-110
-              ${isLarge ? 'text-2xl' : 'text-xl'}
-            `}>
-              {icon}
+          <div className="flex items-center gap-2">
+            <span className="text-rug-text/70">{icon}</span>
+            <span className="text-rug-text/70 uppercase text-sm tracking-wider font-medium">
+              {label}
             </span>
-            {label}
           </div>
-          {showChange && change && (
-            <div className={`
-              text-xs 
-              flex 
-              items-center 
-              gap-1 
-              px-2
-              py-1
-              rounded-full 
-              transition-colors
-              duration-300
-              ${isNegative 
-                ? 'text-red-400 bg-red-500/10' 
-                : 'text-rug-primary bg-rug-primary/10'
-              }
-            `}>
-              {isNegative ? '↓' : '↑'}
-              {change}
-            </div>
-          )}
         </div>
 
-        <div className={`
-          ${isLarge ? 'text-4xl font-bold' : 'text-xl font-medium'}
-          font-mono
-          transition-all
-          duration-300
-          ${isPriceCard 
-            ? (isNegative || isRugPulled)
-              ? 'text-red-400' 
-              : 'text-rug-primary'
-            : 'text-rug-text'
-          }
-          ${isAnimating ? 'scale-105' : ''}
-        `}>
+        <div 
+          className={`
+            ${isLarge ? 'text-4xl font-bold' : 'text-xl font-medium'}
+            font-mono
+            transition-transform
+            duration-150
+            ease-out
+            ${isAnimating ? 'scale-[1.02]' : 'scale-100'}
+            ${isPriceCard 
+              ? (isNegative 
+                ? 'text-red-400' 
+                : 'text-rug-primary'
+              )
+              : 'text-rug-text'
+            }
+          `}
+        >
           {value}
         </div>
 
         {secondaryValue && (
-          <div className="
-            text-sm 
-            text-rug-text/50 
-            font-mono
-            transition-opacity
-            duration-300
-            group-hover:text-rug-text/60
-          ">
+          <div className="text-rug-text/50 text-sm font-mono mt-1">
             {secondaryValue}
+          </div>
+        )}
+
+        {showChange && (
+          <div className={`
+            mt-2 
+            text-sm 
+            font-medium
+            ${isNegative ? 'text-red-400' : 'text-rug-primary'}
+          `}>
+            {change}
           </div>
         )}
       </div>

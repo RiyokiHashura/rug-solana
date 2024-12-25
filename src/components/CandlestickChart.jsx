@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 const CandlestickChart = ({ isRugPulled, triggerCrash, onPriceChange }) => {
   const [candles, setCandles] = useState([]);
@@ -92,14 +92,24 @@ const CandlestickChart = ({ isRugPulled, triggerCrash, onPriceChange }) => {
     return data;
   };
 
+  // Add price update throttling
+  const updatePrice = useCallback((price, isGreen) => {
+    // Use RAF for smooth animation
+    requestAnimationFrame(() => {
+      onPriceChange?.(price, isGreen);
+    });
+  }, [onPriceChange]);
+
   useEffect(() => {
     const basePrice = 0.00060780;
+    let animationFrameId;
     
     const interval = setInterval(() => {
       setCandles(prev => {
-        // If triggerCrash is true, force a crash candle
+        const lastCandle = prev[prev.length - 1] || { close: basePrice };
+        
+        // If crashing, handle that separately
         if (triggerCrash) {
-          const lastCandle = prev[prev.length - 1] || { close: basePrice };
           const crashCandle = {
             open: lastCandle.close,
             close: 0.00000001,
@@ -109,14 +119,11 @@ const CandlestickChart = ({ isRugPulled, triggerCrash, onPriceChange }) => {
             isGreen: false
           };
           
-          // Clear the interval after crash
+          updatePrice(crashCandle.close.toFixed(8), false);
           clearInterval(interval);
-          
           return [...prev.slice(0, -1), crashCandle];
         }
 
-        // Normal candle generation logic
-        const lastCandle = prev[prev.length - 1] || { close: basePrice };
         const open = lastCandle.close;
         const redProbability = consecutiveGreens >= 5 ? 0.4 : 0.15;
         const moveUp = prev.length < 3 ? true : Math.random() > redProbability;
@@ -127,13 +134,14 @@ const CandlestickChart = ({ isRugPulled, triggerCrash, onPriceChange }) => {
           setConsecutiveGreens(0);
         }
 
-        const volatility = Math.random() * (moveUp ? 0.15 : 0.08) + 0.05;
+        // Smoother price movements
+        const volatility = Math.random() * (moveUp ? 0.12 : 0.06) + 0.03; // Reduced volatility
         const close = moveUp 
           ? open * (1 + volatility)
           : open * (1 - volatility * 0.5);
         
-        const high = moveUp ? close * 1.02 : open * 1.02;
-        const low = moveUp ? open * 0.98 : close * 0.98;
+        const high = moveUp ? close * 1.01 : open * 1.01; // Reduced wick size
+        const low = moveUp ? open * 0.99 : close * 0.99;
         
         const newCandle = {
           open,
@@ -146,13 +154,22 @@ const CandlestickChart = ({ isRugPulled, triggerCrash, onPriceChange }) => {
 
         setCurrentDirection(moveUp);
         
+        // Smooth price updates
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = requestAnimationFrame(() => {
+          updatePrice(close.toFixed(8), moveUp);
+        });
+        
         const updatedCandles = [...prev, newCandle].slice(-maxCandles);
         return updatedCandles;
       });
     }, 1000);
 
-    return () => clearInterval(interval);
-  }, [consecutiveGreens, triggerCrash]);
+    return () => {
+      clearInterval(interval);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, [consecutiveGreens, triggerCrash, updatePrice]);
 
   const scaleToChart = (price) => {
     if (candles.length === 0) return 0;
