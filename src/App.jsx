@@ -67,7 +67,7 @@ function App() {
   };
 
   return (
-    <>
+    <div className="relative min-h-screen">
       <Suspense fallback={<div className="fixed inset-0 bg-rug-dark" />}>
         <AnimatedBackground />
       </Suspense>
@@ -229,7 +229,7 @@ function App() {
           />
         )}
       </Suspense>
-    </>
+    </div>
   );
 }
 
