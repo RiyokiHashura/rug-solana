@@ -182,7 +182,7 @@ function App() {
                       triggerCrash={triggerCrash}
                       onPriceChange={(price, isGreen) => setPriceData({ price, isGreen })}
                     />
-                    <div className="mt-8">
+                    <div className="mt-6">
                       <BuyButton 
                         onRug={() => {
                           setIsRugPulled(true);
