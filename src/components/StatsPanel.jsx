@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 const StatsPanel = ({ isRugPulled, currentPrice, isGreen }) => {
   const [showUSD, setShowUSD] = useState(true);
@@ -99,80 +99,117 @@ const StatsPanel = ({ isRugPulled, currentPrice, isGreen }) => {
     isAnimating = false,
     showChange = true,
     isPriceCard = false
-  }) => (
-    <div className={`
-      relative
-      ${isLarge ? 'p-6' : 'p-4'}
-      rounded-xl
-      ${isLarge 
-        ? 'bg-gradient-to-br from-rug-dark-deeper/90 to-rug-dark-deeper/50' 
-        : 'bg-gradient-to-br from-rug-dark-deeper/80 via-rug-dark-deeper/60 to-rug-dark-deeper/40'
+  }) => {
+    const cardRef = useRef(null);
+    
+    useEffect(() => {
+      if (cardRef.current) {
+        cardRef.current.style.willChange = 'transform, opacity';
       }
-      backdrop-blur-sm 
-      border 
-      border-rug-dark/30
-      transition-all
-      duration-300
-      ease-out
-      hover:scale-[1.02]
-      hover:-translate-y-0.5
-      hover:border-rug-secondary/20
-      hover:shadow-lg
-      hover:shadow-rug-secondary/5
-      group
-      cursor-default
-      overflow-hidden
-      ${isPriceCard ? 'animate-gpu' : ''}
-    `}>
-      <div className="relative z-10">
-        <div className="flex justify-between items-start">
-          <div className="flex items-center gap-2">
-            <span className="text-rug-text/70">{icon}</span>
-            <span className="text-rug-text/70 uppercase text-sm tracking-wider font-medium">
-              {label}
-            </span>
-          </div>
-        </div>
+    }, []);
 
+    return (
+      <div 
+        ref={cardRef}
+        className={`
+          relative
+          ${isLarge ? 'p-6' : 'p-4'}
+          rounded-xl
+          transform-gpu
+          will-change-[transform,opacity]
+          bg-gradient-to-br 
+          ${isLarge 
+            ? 'from-rug-dark-deeper/90 to-rug-dark-deeper/50' 
+            : 'from-rug-dark-deeper/80 via-rug-dark-deeper/60 to-rug-dark-deeper/40'}
+          backdrop-blur-sm 
+          border 
+          border-rug-dark/30
+          transition-transform 
+          duration-200 
+          ease-in-out
+          hover:scale-[1.01]
+          hover:translate-z-0
+          hover:border-rug-secondary/20
+          cursor-default
+          overflow-hidden
+          group
+        `}
+      >
+        {/* Glow Overlay */}
         <div 
-          className={`
-            ${isLarge ? 'text-4xl font-bold' : 'text-xl font-medium'}
-            font-mono
-            transition-transform
-            duration-150
-            ease-out
-            ${isAnimating ? 'scale-[1.02]' : 'scale-100'}
-            ${isPriceCard 
-              ? (isNegative 
-                ? 'text-red-400' 
-                : 'text-rug-primary'
-              )
-              : 'text-rug-text'
-            }
-          `}
-        >
-          {value}
+          className="
+            absolute 
+            inset-0 
+            bg-gradient-to-b 
+            from-rug-secondary/5 
+            to-transparent
+            opacity-0
+            transition-opacity
+            duration-200
+            ease-in-out
+            group-hover:opacity-100
+            pointer-events-none
+            rounded-xl
+          "
+          aria-hidden="true"
+        />
+
+        <div className="relative z-10 pointer-events-none">
+          <div className="flex justify-between items-start pointer-events-none">
+            <div className="flex items-center gap-2">
+              <span className="text-rug-text/70 transition-colors duration-200 group-hover:text-rug-text/90 pointer-events-none">
+                {icon}
+              </span>
+              <span className="text-rug-text/70 uppercase text-sm tracking-wider font-medium transition-colors duration-200 group-hover:text-rug-text/90 pointer-events-none">
+                {label}
+              </span>
+            </div>
+          </div>
+
+          <div 
+            className={`
+              ${isLarge ? 'text-4xl font-bold' : 'text-xl font-medium'}
+              font-mono
+              transition-transform
+              duration-150
+              ease-in-out
+              ${isAnimating ? 'scale-[1.01]' : 'scale-100'}
+              ${isPriceCard 
+                ? (isNegative 
+                  ? 'text-red-400' 
+                  : 'text-rug-primary'
+                )
+                : 'text-rug-text'
+              }
+              pointer-events-none
+            `}
+          >
+            {value}
+          </div>
+
+          {secondaryValue && (
+            <div className="text-rug-text/50 text-sm font-mono mt-1 transition-colors duration-200 group-hover:text-rug-text/70 pointer-events-none">
+              {secondaryValue}
+            </div>
+          )}
+
+          {showChange && (
+            <div className={`
+              mt-2 
+              text-sm 
+              font-medium
+              transition-colors
+              duration-200
+              ${isNegative ? 'text-red-400' : 'text-rug-primary'}
+              pointer-events-none
+            `}>
+              {change}
+            </div>
+          )}
         </div>
-
-        {secondaryValue && (
-          <div className="text-rug-text/50 text-sm font-mono mt-1">
-            {secondaryValue}
-          </div>
-        )}
-
-        {showChange && (
-          <div className={`
-            mt-2 
-            text-sm 
-            font-medium
-            ${isNegative ? 'text-red-400' : 'text-rug-primary'}
-          `}>
-            {change}
-          </div>
-        )}
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="space-y-8">

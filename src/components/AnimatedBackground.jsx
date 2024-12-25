@@ -1,63 +1,46 @@
-const particles = Array.from({ length: 25 }, (_, i) => ({
+const particles = Array.from({ length: 15 }, (_, i) => ({
   id: i,
-  size: Math.random() * 3 + 1.5,
+  size: Math.random() * 2 + 1,
   left: Math.random() * 90 + 5,
   top: Math.random() * 90 + 5,
-  delay: Math.random() * -15,
-  opacity: Math.random() * 0.2 + 0.1
+  delay: Math.random() * -8,
+  opacity: Math.random() * 0.1 + 0.05
 }));
 
 const AnimatedBackground = () => {
   return (
     <div 
+      className="fixed inset-0 z-[-1] overflow-hidden transform-gpu"
       style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
         background: 'linear-gradient(180deg, #0D1117 0%, #0D1117 35%, #0F1C18 100%)',
-        zIndex: -1,
-        overflow: 'hidden'
+        willChange: 'transform'
       }}
     >
       {particles.map(particle => (
         <div
-          key={`static-${particle.id}`}
+          key={particle.id}
+          className="absolute rounded-full transform-gpu"
           style={{
-            position: 'absolute',
-            width: `${particle.size}px`,
-            height: `${particle.size}px`,
             left: `${particle.left}%`,
             top: `${particle.top}%`,
-            borderRadius: '50%',
-            backgroundColor: 'rgba(0, 255, 157, ' + particle.opacity + ')',
-            boxShadow: '0 0 3px rgba(0, 255, 157, 0.2)',
-            animation: `scatter 22.5s linear infinite`,
-            animationDelay: `${particle.delay}s`
+            width: `${particle.size}px`,
+            height: `${particle.size}px`,
+            background: 'rgba(0, 255, 157, 0.4)',
+            opacity: particle.opacity,
+            animation: `float 20s infinite ease-in-out`,
+            animationDelay: `${particle.delay}s`,
+            willChange: 'transform'
           }}
         />
       ))}
 
-      {/* Subtle vignette overlay */}
-      <div 
-        style={{
-          position: 'absolute',
-          inset: 0,
-          background: 'radial-gradient(circle at center, transparent 0%, rgba(13, 17, 23, 0.3) 100%)',
-          pointerEvents: 'none'
-        }}
-      />
-
       <style>
         {`
-          @keyframes scatter {
-            0% { transform: translate(0, 0); }
-            20% { transform: translate(20px, -15px); }
-            40% { transform: translate(-15px, 20px); }
-            60% { transform: translate(-20px, -20px); }
-            80% { transform: translate(15px, 15px); }
-            100% { transform: translate(0, 0); }
+          @keyframes float {
+            0%, 100% { transform: translate3d(0, 0, 0); }
+            25% { transform: translate3d(10px, -10px, 0); }
+            50% { transform: translate3d(-5px, 15px, 0); }
+            75% { transform: translate3d(-15px, -5px, 0); }
           }
         `}
       </style>
