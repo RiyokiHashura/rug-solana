@@ -5,10 +5,10 @@ const CandlestickChart = ({ isRugPulled, triggerCrash, onPriceChange }) => {
   const [hoverData, setHoverData] = useState(null);
   const [cursorX, setCursorX] = useState(null);
   const chartRef = useRef(null);
-  const width = 600;
-  const height = 300;
-  const candleWidth = 16;
-  const spacing = 1;
+  const width = 800;
+  const height = 400;
+  const candleWidth = 18;
+  const spacing = 2;
   const maxCandles = 40;
   const [initialPrice, setInitialPrice] = useState(null);
   const [priceChange, setPriceChange] = useState(0);
@@ -186,10 +186,11 @@ const CandlestickChart = ({ isRugPulled, triggerCrash, onPriceChange }) => {
         backdrop-blur-sm
         border
         border-rug-dark
-        transition-all
+        transition-gpu
         duration-300
         hover:border-rug-secondary/20
         shadow-[0_0_15px_-3px_rgba(0,255,157,0.15)]
+        animate-gpu
       ">
         {/* Container glow effect */}
         <div className="

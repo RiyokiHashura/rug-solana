@@ -112,7 +112,7 @@ const StatsPanel = ({ isRugPulled, currentPrice, isGreen }) => {
       backdrop-blur-sm 
       border 
       border-rug-dark/30
-      transition-all
+      transition-gpu
       duration-300
       hover:scale-[1.02]
       hover:-translate-y-0.5
@@ -122,6 +122,7 @@ const StatsPanel = ({ isRugPulled, currentPrice, isGreen }) => {
       group
       cursor-default
       overflow-hidden
+      animate-gpu
     `}>
       {/* Gradient overlay on hover */}
       <div className="

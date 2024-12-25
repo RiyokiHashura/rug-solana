@@ -21,7 +21,8 @@ const RugPullModal = ({ isVisible, onTryAgain, onJoinChat }) => {
         border 
         border-rug-primary/20
         shadow-[0_0_30px_-5px_rgba(0,255,157,0.3)]
-        animate-scale-in
+        animate-gpu
+        transition-gpu
       ">
         {/* Header */}
         <h2 className="

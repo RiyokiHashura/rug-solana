@@ -1,14 +1,16 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, lazy, Suspense } from 'react';
 import CandlestickChart from './components/CandlestickChart';
 import BuyButton from './components/BuyButton';
-import AnimatedBackground from './components/AnimatedBackground';
 import StatsPanel from './components/StatsPanel';
 import GlitchEffect from './components/GlitchEffect';
 import Sparkle from './components/Sparkle';
 import Footer from './components/Footer';
-import LiveChat from './components/LiveChat';
 import LoadingScreen from './components/LoadingScreen';
-import RugPullModal from './components/RugPullModal';
+
+// Lazy load non-critical components
+const LiveChat = lazy(() => import('./components/LiveChat'));
+const RugPullModal = lazy(() => import('./components/RugPullModal'));
+const AnimatedBackground = lazy(() => import('./components/AnimatedBackground'));
 
 function App() {
   const [isRugPulled, setIsRugPulled] = useState(false);
@@ -24,10 +26,10 @@ function App() {
   const [showRugPullModal, setShowRugPullModal] = useState(false);
 
   useEffect(() => {
-    // Simulate data loading
+    // Reduced from 2000ms to 800ms
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 2000);
+    }, 800);
 
     return () => clearTimeout(timer);
   }, []);
@@ -66,7 +68,9 @@ function App() {
 
   return (
     <>
-      <AnimatedBackground />
+      <Suspense fallback={<div className="fixed inset-0 bg-rug-dark" />}>
+        <AnimatedBackground />
+      </Suspense>
       <div className="relative">
         <LoadingScreen isLoading={isLoading} />
         <div 
@@ -169,21 +173,20 @@ function App() {
               </header>
 
               {/* Main Content */}
-              <main className="max-w-7xl mx-auto px-4 py-8">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <main className="max-w-[1920px] mx-auto px-8 py-8">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                   {/* Chart Section */}
-                  <div className="lg:col-span-2">
+                  <div className="lg:col-span-2 min-h-[600px]">
                     <CandlestickChart 
                       isRugPulled={isRugPulled}
                       triggerCrash={triggerCrash}
                       onPriceChange={(price, isGreen) => setPriceData({ price, isGreen })}
                     />
-                    <div className="mt-6">
+                    <div className="mt-8">
                       <BuyButton 
                         onRug={() => {
                           setIsRugPulled(true);
                           setTriggerCrash(true);
-                          // Show modal after a short delay
                           setTimeout(() => setShowRugPullModal(true), 1000);
                         }}
                         disabled={isRugPulled}
@@ -193,11 +196,13 @@ function App() {
 
                   {/* Stats Panel */}
                   <div className="lg:col-span-1">
-                    <StatsPanel 
-                      isRugPulled={isRugPulled}
-                      currentPrice={priceData.price}
-                      isGreen={priceData.isGreen}
-                    />
+                    <div className="lg:sticky lg:top-8">
+                      <StatsPanel 
+                        isRugPulled={isRugPulled}
+                        currentPrice={priceData.price}
+                        isGreen={priceData.isGreen}
+                      />
+                    </div>
                   </div>
                 </div>
               </main>
@@ -208,16 +213,22 @@ function App() {
               <Footer />
             </div>
 
-            <LiveChat />
+            <Suspense fallback={null}>
+              <LiveChat />
+            </Suspense>
           </div>
         </div>
       </div>
 
-      <RugPullModal 
-        isVisible={showRugPullModal}
-        onTryAgain={handleTryAgain}
-        onJoinChat={handleJoinChat}
-      />
+      <Suspense fallback={null}>
+        {showRugPullModal && (
+          <RugPullModal 
+            isVisible={showRugPullModal}
+            onTryAgain={handleTryAgain}
+            onJoinChat={handleJoinChat}
+          />
+        )}
+      </Suspense>
     </>
   );
 }

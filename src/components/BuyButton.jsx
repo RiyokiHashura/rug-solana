@@ -116,8 +116,9 @@ const BuyButton = ({ onRug, disabled }) => {
           text-xl
           uppercase
           transform
-          transition-all
+          transition-gpu
           duration-300
+          animate-gpu
           shadow-lg
           shadow-rug-primary/20
           hover:shadow-rug-primary/30
