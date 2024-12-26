@@ -311,7 +311,7 @@ const CandlestickChart = ({ isRugPulled, triggerCrash, onPriceChange }) => {
 
             {/* Enhanced candles */}
             {candles.map((candle, i) => {
-              const x = width - ((candles.length - i) * (candleWidth + spacing)) - 50;
+              const x = width - ((candles.length - i) * (candleWidth + spacing)) - 35;
               const isLatest = i === candles.length - 1;
               
               return (
