@@ -5,7 +5,7 @@ const CandlestickChart = ({ isRugPulled, triggerCrash, onPriceChange }) => {
   const [hoverData, setHoverData] = useState(null);
   const [cursorX, setCursorX] = useState(null);
   const chartRef = useRef(null);
-  const width = 500;
+  const width = 750;
   const height = 400;
   const candleWidth = 16;
   const spacing = 2;
@@ -198,7 +198,7 @@ const CandlestickChart = ({ isRugPulled, triggerCrash, onPriceChange }) => {
   }, [candles, currentDirection]);
 
   return (
-    <div className="relative group flex justify-center">
+    <div className="relative group flex justify-center mb-8">
       {/* Chart container with enhanced glow effect */}
       <div className="
         relative 
