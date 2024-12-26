@@ -1,8 +1,77 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+
+const HYPE_MESSAGES = [
+  "WAGMI BOYS 🚀💎🙌",
+  "This chart lookin' like my homework grades... straight A's 🟢📊",
+  "Mama, we made it! 🤑📈",
+  "Lambo season incoming 🏎️💨",
+  "Green candles look better than Christmas trees 🎄🚀",
+  "Real ones bought the dip. Fake ones crying in DMs 🫡📉📈",
+  "Market cap still low, moon potential is crazy 🌕",
+  "Volume is going crazy, whales are swimming in 🐋🟢",
+  "LET'S GOOOOOOO 🚀🔥",
+  "FOMO is real, bro 😂💸",
+  "This is the way 🛡️🚀",
+  "Next stop? Moon. Final destination? Pluto 🌕🪐",
+  "Bro, my grandma just invested. This is the bottom, trust 📊😂",
+  "I'm sweating harder than my math exam rn 🫠📈",
+  "Mom said it's bedtime. I said it's moon time 🌕🚀",
+  "If this hits $1, I'm buying the McDonald's I used to work at 🍟😂",
+  "Bro, I'm literally breathing in profit right now 🫁💸",
+  "This coin printing more green than my printer 🖨️🟢",
+  "Someone check on my heart rate monitor 📊💓",
+  "If this keeps pumping, I might tell my crush I like her 😳💚",
+  "Just told my dog we're rich. He barked twice. It's happening 🐕🚀",
+  "My wallet looks sexier than me rn, no cap 😂💸",
+  "Sell? Bro, I don't even know what that word means 🤓🟢",
+  "This chart is straighter than my posture after gaming for 8 hours 💺😂",
+  "Bro, I just invested my lunch money. No regrets 🥪📊",
+  "Holding tighter than my WiFi connection at 2AM 📶💎",
+  "Bro, I can't lie… my wallet just smiled at me 🤑📈",
+  "If this hits $10, I'm retiring… at 16 😂💼",
+  "My financial advisor is a meme page and honestly, it's working out 🤝📊",
+  "Bro, my money is making money while I sit here eating chips 😂🟢",
+  "This coin got more XP than my main account 😂🎮",
+  "Bro, this is better loot than a legendary chest 🪙✨",
+  "This chart got better aim than me in Valorant 🎯📊",
+  "If this was Minecraft, we'd be in creative mode rn 🟩🚀",
+  "LFG boys, final boss incoming 🐉📈",
+  "Holding this coin feels like clutching a 1v5 in CS:GO 😂🛡️",
+  "If this coin was in Fortnite, it'd have max mats and a golden SCAR 😂📊",
+  "I'm about to alt+F4 my wallet. Too much profit 😂🖥️",
+  "This graph is more satisfying than a headshot sound in COD 🎯📈",
+  "Someone call 911, my wallet is on fire 🔥😂",
+  "At this point, I'm emotionally attached to this coin 🫂🟢",
+  "If this goes down, I'm blaming my cat 🐈📉",
+  "Bro, I showed this chart to my crush. She left me on read 😂💔",
+  "This coin rising faster than my GPA after extra credit 📈📚",
+  "Every green candle adds +1 to my self-esteem 🟢✨",
+  "Bro, I just ordered sushi. Feeling rich 🍣💸",
+  "If this hits ATH, I'm naming my firstborn after this coin 😂👶",
+  "I sold my gaming chair for this. Worth it 🪑📊",
+  "At this rate, I'll be retiring before my dad 😂👴📈"
+];
 
 const LiveChat = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeUsers] = useState(1420 + Math.floor(Math.random() * 100));
+  const [chatMessages, setChatMessages] = useState([]);
+  const chatRef = useRef(null);
+
+  useEffect(() => {
+    if (!isExpanded) return;
+
+    const interval = setInterval(() => {
+      const newMessage = {
+        id: Date.now(),
+        text: HYPE_MESSAGES[Math.floor(Math.random() * HYPE_MESSAGES.length)],
+        timestamp: new Date().toLocaleTimeString()
+      };
+      setChatMessages(prev => [...prev, newMessage].slice(-50));
+    }, 500);
+
+    return () => clearInterval(interval);
+  }, [isExpanded]);
 
   return (
     <div className="
@@ -91,24 +160,46 @@ const LiveChat = () => {
             Live Chat
           </div>
           <div className="text-xs text-rug-text/50">
-            {activeUsers.toLocaleString()} users active 🟢
+            {activeUsers} users active 🟢
           </div>
         </div>
       </button>
 
-      {/* Chat Overlay */}
+      {/* Updated Chat Overlay */}
       {isExpanded && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm">
-          <button 
-            onClick={() => setIsExpanded(false)}
-            className="absolute top-4 right-4 text-white"
-          >
-            Close
-          </button>
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center">
+          <div className="w-full max-w-lg bg-rug-dark-deeper/95 rounded-xl border border-rug-dark/30 p-4 m-4">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-rug-text font-bold">Live Chat</h3>
+              <button 
+                onClick={() => setIsExpanded(false)}
+                className="text-rug-text/70 hover:text-rug-text"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div 
+              ref={chatRef}
+              className="h-[400px] overflow-y-auto space-y-2 mb-4"
+            >
+              {chatMessages.map(msg => (
+                <div 
+                  key={msg.id}
+                  className="bg-rug-dark/30 rounded p-2 text-rug-text/90"
+                >
+                  <span className="text-xs text-rug-text/50 mr-2">
+                    {msg.timestamp}
+                  </span>
+                  {msg.text}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       )}
     </div>
   );
 };
 
-export default LiveChat; 
+export default LiveChat;

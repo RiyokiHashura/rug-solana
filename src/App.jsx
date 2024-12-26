@@ -6,10 +6,10 @@ import GlitchEffect from './components/GlitchEffect';
 import Sparkle from './components/Sparkle';
 import Footer from './components/Footer';
 import LoadingScreen from './components/LoadingScreen';
+import RugPullModal from './components/RugPullModal';
+import LiveChat from './components/LiveChat';
 
 // Lazy load non-critical components
-const LiveChat = lazy(() => import('./components/LiveChat'));
-const RugPullModal = lazy(() => import('./components/RugPullModal'));
 const AnimatedBackground = lazy(() => import('./components/AnimatedBackground'));
 
 function App() {
@@ -24,6 +24,7 @@ function App() {
   });
   const [triggerCrash, setTriggerCrash] = useState(false);
   const [showRugPullModal, setShowRugPullModal] = useState(false);
+  const [showChat, setShowChat] = useState(false);
 
   useEffect(() => {
     // Reduced from 2000ms to 800ms
@@ -62,8 +63,7 @@ function App() {
   };
 
   const handleJoinChat = () => {
-    // Trigger chat open
-    setShowRugPullModal(false);
+    setShowChat(true);
   };
 
   return (
@@ -187,7 +187,9 @@ function App() {
                         onRug={() => {
                           setIsRugPulled(true);
                           setTriggerCrash(true);
-                          setTimeout(() => setShowRugPullModal(true), 1000);
+                          setTimeout(() => {
+                            setShowRugPullModal(true);
+                          }, 1500);
                         }}
                         disabled={isRugPulled}
                       />
@@ -214,7 +216,7 @@ function App() {
             </div>
 
             <Suspense fallback={null}>
-              <LiveChat />
+              <LiveChat isExpanded={showChat} onClose={() => setShowChat(false)} />
             </Suspense>
           </div>
         </div>
@@ -223,7 +225,7 @@ function App() {
       <Suspense fallback={null}>
         {showRugPullModal && (
           <RugPullModal 
-            isVisible={showRugPullModal}
+            isVisible={isRugPulled}
             onTryAgain={handleTryAgain}
             onJoinChat={handleJoinChat}
           />

@@ -1,10 +1,10 @@
-const particles = Array.from({ length: 15 }, (_, i) => ({
+const particles = Array.from({ length: 20 }, (_, i) => ({
   id: i,
-  size: Math.random() * 2 + 1,
+  size: Math.random() * 3 + 1,
   left: Math.random() * 90 + 5,
   top: Math.random() * 90 + 5,
   delay: Math.random() * -8,
-  opacity: Math.random() * 0.1 + 0.05
+  opacity: Math.random() * 0.15 + 0.1
 }));
 
 const AnimatedBackground = () => {
