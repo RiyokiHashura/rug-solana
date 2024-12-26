@@ -5,7 +5,7 @@ const CandlestickChart = ({ isRugPulled, triggerCrash, onPriceChange }) => {
   const [hoverData, setHoverData] = useState(null);
   const [cursorX, setCursorX] = useState(null);
   const chartRef = useRef(null);
-  const width = 750;
+  const width = 850;
   const height = 400;
   const candleWidth = 16;
   const spacing = 2;
