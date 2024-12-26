@@ -9,11 +9,10 @@
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d docs"
   },
-  "homepage": "https://riyokihashura.github.io/rug-solana",
+  "homepage": "https://rugsolana.art",
   "dependencies": {
-    "gh-pages": "^6.2.0",
     "lightweight-charts": "^4.2.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
@@ -23,6 +22,7 @@
     "@types/react-dom": "^18.2.7",
     "@vitejs/plugin-react": "^4.0.3",
     "autoprefixer": "^10.4.14",
+    "gh-pages": "^6.2.0",
     "postcss": "^8.4.27",
     "tailwindcss": "^3.3.3",
     "terser": "^5.37.0",

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import ChatModal from './ChatModal';
 
 const HEADERS = [
@@ -53,13 +53,9 @@ const CHAOS_MESSAGES = [
 const RugPullModal = ({ isVisible, onTryAgain, onJoinChat }) => {
   const [showChat, setShowChat] = useState(false);
 
-  // Store random messages in state when modal first appears
-  const [header] = useState(() => 
-    HEADERS[Math.floor(Math.random() * HEADERS.length)]
-  );
-  const [subtext] = useState(() => 
-    SUBTEXTS[Math.floor(Math.random() * SUBTEXTS.length)]
-  );
+  // Use refs to store the initial random messages
+  const headerRef = useRef(HEADERS[Math.floor(Math.random() * HEADERS.length)]);
+  const subtextRef = useRef(SUBTEXTS[Math.floor(Math.random() * SUBTEXTS.length)]);
 
   if (!isVisible) return null;
 
@@ -90,7 +86,7 @@ const RugPullModal = ({ isVisible, onTryAgain, onJoinChat }) => {
             text-rug-text
             font-mono
           ">
-            {header}
+            {headerRef.current}
           </h2>
 
           <p className="
@@ -99,7 +95,7 @@ const RugPullModal = ({ isVisible, onTryAgain, onJoinChat }) => {
             mb-8
             leading-relaxed
           ">
-            {subtext}
+            {subtextRef.current}
           </p>
 
           <div className="flex flex-col gap-4">

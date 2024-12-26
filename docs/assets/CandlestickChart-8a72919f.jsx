@@ -17,6 +17,7 @@ const CandlestickChart = ({ isRugPulled, triggerCrash, onPriceChange }) => {
   const [currentDirection, setCurrentDirection] = useState(true);
   const [consecutiveGreens, setConsecutiveGreens] = useState(0);
 
+  // Format numbers for tooltip
   const formatNumber = (num) => {
     if (num >= 1000000) return `$${(num / 1000000).toFixed(1)}M`;
     if (num >= 1000) return `$${(num / 1000).toFixed(1)}K`;
@@ -63,12 +64,18 @@ const CandlestickChart = ({ isRugPulled, triggerCrash, onPriceChange }) => {
     
     for (let i = 0; i < periods; i++) {
       const time = new Date(Date.now() - (periods - i) * 3600000);
+      
+      // Keep similar movement pattern but with longer candles
       const moveUp = Math.random() > 0.1;
-      const volatility = Math.random() * 0.15 + 0.05;
+      const volatility = Math.random() * 0.15 + 0.05; // 5-20% moves
       const movement = volatility * (moveUp ? 1 : -0.3);
+      
       price *= (1 + movement);
-      const wickSize = Math.random() * 0.08;
-      const bodySize = Math.random() * 0.35 + 0.15;
+      
+      // Much longer bodies but controlled wicks
+      const wickSize = Math.random() * 0.08; // 8% max wick
+      const bodySize = Math.random() * 0.35 + 0.15; // 15-50% body size
+      
       const open = price * (1 - bodySize/2);
       const close = price * (1 + bodySize/2);
       const high = Math.max(open, close) * (1 + wickSize);
@@ -85,7 +92,9 @@ const CandlestickChart = ({ isRugPulled, triggerCrash, onPriceChange }) => {
     return data;
   };
 
+  // Add price update throttling
   const updatePrice = useCallback((price, isGreen) => {
+    // Use RAF for smooth animation
     requestAnimationFrame(() => {
       onPriceChange?.(price, isGreen);
     });
@@ -99,6 +108,7 @@ const CandlestickChart = ({ isRugPulled, triggerCrash, onPriceChange }) => {
       setCandles(prev => {
         const lastCandle = prev[prev.length - 1] || { close: basePrice };
         
+        // If crashing, handle that separately
         if (triggerCrash) {
           const crashCandle = {
             open: lastCandle.close,
@@ -111,7 +121,13 @@ const CandlestickChart = ({ isRugPulled, triggerCrash, onPriceChange }) => {
           
           updatePrice(crashCandle.close.toFixed(8), false);
           clearInterval(interval);
-          return [...prev.slice(0, -1), crashCandle];
+
+          // Add delay before showing modal
+          setTimeout(() => {
+            setIsRugPulled(true);
+          }, 1000);
+
+          return [...prev, crashCandle];
         }
 
         const open = lastCandle.close;
@@ -124,12 +140,13 @@ const CandlestickChart = ({ isRugPulled, triggerCrash, onPriceChange }) => {
           setConsecutiveGreens(0);
         }
 
-        const volatility = Math.random() * (moveUp ? 0.12 : 0.06) + 0.03;
+        // Smoother price movements
+        const volatility = Math.random() * (moveUp ? 0.12 : 0.06) + 0.03; // Reduced volatility
         const close = moveUp 
           ? open * (1 + volatility)
           : open * (1 - volatility * 0.5);
         
-        const high = moveUp ? close * 1.01 : open * 1.01;
+        const high = moveUp ? close * 1.01 : open * 1.01; // Reduced wick size
         const low = moveUp ? open * 0.99 : close * 0.99;
         
         const newCandle = {
@@ -143,6 +160,7 @@ const CandlestickChart = ({ isRugPulled, triggerCrash, onPriceChange }) => {
 
         setCurrentDirection(moveUp);
         
+        // Smooth price updates
         cancelAnimationFrame(animationFrameId);
         animationFrameId = requestAnimationFrame(() => {
           updatePrice(close.toFixed(8), moveUp);
@@ -167,8 +185,9 @@ const CandlestickChart = ({ isRugPulled, triggerCrash, onPriceChange }) => {
     const maxPrice = Math.max(...prices);
     const priceRange = maxPrice - minPrice;
     
+    // Use exact price points without padding
     const scaledY = ((price - minPrice) / priceRange) * (height * 0.9);
-    return height - scaledY - (height * 0.05);
+    return height - scaledY - (height * 0.05); // Small padding top/bottom
   };
 
   useEffect(() => {
@@ -180,13 +199,64 @@ const CandlestickChart = ({ isRugPulled, triggerCrash, onPriceChange }) => {
 
   return (
     <div className="relative group">
-      <div className="relative p-6 bg-black/80 rounded-lg border border-gray-800 shadow-lg">
-        <div className="absolute inset-0 -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-r from-rug-primary/5 via-rug-secondary/5 to-rug-primary/5 blur-xl" />
-        
-        <div className="absolute inset-0 rounded-xl overflow-hidden">
-          <div className="absolute top-0 left-0 w-[200%] h-full bg-gradient-to-r from-transparent via-rug-secondary/20 to-transparent -translate-x-[100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out" />
+      {/* Chart container with enhanced glow effect */}
+      <div className="
+        relative 
+        p-6 
+        rounded-xl 
+        overflow-hidden
+        bg-rug-dark-deeper/30
+        backdrop-blur-sm
+        border
+        border-rug-dark
+        transition-gpu
+        duration-300
+        hover:border-rug-secondary/20
+        shadow-[0_0_15px_-3px_rgba(0,255,157,0.15)]
+        animate-gpu
+      ">
+        {/* Container glow effect */}
+        <div className="
+          absolute
+          inset-0
+          -z-10
+          opacity-0
+          group-hover:opacity-100
+          transition-opacity
+          duration-500
+          bg-gradient-to-r
+          from-rug-primary/5
+          via-rug-secondary/5
+          to-rug-primary/5
+          blur-xl
+        " />
+
+        {/* Animated border */}
+        <div className="
+          absolute 
+          inset-0 
+          rounded-xl 
+          overflow-hidden
+        ">
+          <div className="
+            absolute 
+            top-0 
+            left-0 
+            w-[200%] 
+            h-full
+            bg-gradient-to-r 
+            from-transparent 
+            via-rug-secondary/20 
+            to-transparent
+            -translate-x-[100%]
+            group-hover:translate-x-[100%]
+            transition-transform
+            duration-1000
+            ease-in-out
+          " />
         </div>
 
+        {/* Chart content */}
         <div 
           ref={chartRef}
           className="relative"
@@ -198,6 +268,7 @@ const CandlestickChart = ({ isRugPulled, triggerCrash, onPriceChange }) => {
             height={height} 
             className="relative z-10"
           >
+            {/* Enhanced grid lines */}
             <g className="text-rug-text/[0.08]">
               {Array.from({ length: 6 }).map((_, i) => (
                 <line
@@ -225,6 +296,7 @@ const CandlestickChart = ({ isRugPulled, triggerCrash, onPriceChange }) => {
               ))}
             </g>
 
+            {/* Enhanced cursor line */}
             {cursorX !== null && (
               <line
                 x1={cursorX}
@@ -237,36 +309,52 @@ const CandlestickChart = ({ isRugPulled, triggerCrash, onPriceChange }) => {
               />
             )}
 
+            {/* Enhanced candles */}
             {candles.map((candle, i) => {
               const x = width - ((candles.length - i) * (candleWidth + spacing));
               const isLatest = i === candles.length - 1;
               
               return (
                 <g key={i}>
+                  {/* Wick */}
                   <line
                     x1={x + candleWidth / 2}
                     y1={scaleToChart(candle.high)}
                     x2={x + candleWidth / 2}
                     y2={scaleToChart(candle.low)}
-                    className={`stroke-current ${candle.isGreen ? 'text-rug-primary' : 'text-red-500'} ${isLatest && (candle.isGreen ? 'filter drop-shadow-glow' : 'filter drop-shadow-glow-red')}`}
+                    className={`
+                      stroke-current 
+                      ${candle.isGreen ? 'text-rug-primary' : 'text-red-500'}
+                      ${isLatest && (candle.isGreen ? 'filter drop-shadow-glow' : 'filter drop-shadow-glow-red')}
+                    `}
                     strokeWidth="1"
                   />
                   
+                  {/* Body */}
                   <rect
                     x={x}
                     y={scaleToChart(Math.max(candle.open, candle.close))}
                     width={candleWidth}
                     height={Math.abs(scaleToChart(candle.open) - scaleToChart(candle.close))}
-                    className={`${candle.isGreen ? 'fill-rug-primary' : 'fill-red-500'} ${isLatest && (candle.isGreen ? 'filter drop-shadow-glow' : 'filter drop-shadow-glow-red')}`}
+                    className={`
+                      ${candle.isGreen ? 'fill-rug-primary' : 'fill-red-500'}
+                      ${isLatest && (candle.isGreen ? 'filter drop-shadow-glow' : 'filter drop-shadow-glow-red')}
+                    `}
                   />
 
+                  {/* Latest candle glow effect */}
                   {isLatest && (
                     <rect
                       x={x}
                       y={scaleToChart(Math.max(candle.open, candle.close))}
                       width={candleWidth}
                       height={Math.abs(scaleToChart(candle.open) - scaleToChart(candle.close))}
-                      className={`${candle.isGreen ? 'fill-rug-primary' : 'fill-red-500'} opacity-50 blur-sm animate-pulse-subtle`}
+                      className={`
+                        ${candle.isGreen ? 'fill-rug-primary' : 'fill-red-500'}
+                        opacity-50
+                        blur-sm
+                        animate-pulse-subtle
+                      `}
                     />
                   )}
                 </g>
@@ -274,9 +362,27 @@ const CandlestickChart = ({ isRugPulled, triggerCrash, onPriceChange }) => {
             })}
           </svg>
 
+          {/* Enhanced tooltip */}
           {hoverData && (
             <div 
-              className="absolute z-20 bg-rug-dark/95 backdrop-blur-sm border border-rug-dark-deeper rounded-lg p-3 shadow-xl pointer-events-none transform -translate-x-1/2 -translate-y-full transition-all duration-200 animate-fade-in"
+              className="
+                absolute 
+                z-20 
+                bg-rug-dark/95 
+                backdrop-blur-sm 
+                border 
+                border-rug-dark-deeper 
+                rounded-lg 
+                p-3 
+                shadow-xl
+                pointer-events-none
+                transform
+                -translate-x-1/2
+                -translate-y-full
+                transition-all
+                duration-200
+                animate-fade-in
+              "
               style={{
                 left: `${hoverData.x}px`,
                 top: `${hoverData.y - 16}px`,
@@ -288,7 +394,9 @@ const CandlestickChart = ({ isRugPulled, triggerCrash, onPriceChange }) => {
                 </div>
                 <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
                   <div className="text-rug-text/70">Price</div>
-                  <div className={`font-mono ${hoverData.isGreen ? 'text-rug-primary' : 'text-red-400'}`}>
+                  <div className={`font-mono ${
+                    hoverData.isGreen ? 'text-rug-primary' : 'text-red-400'
+                  }`}>
                     {formatNumber(hoverData.price)}
                   </div>
                   <div className="text-rug-text/70">Volume</div>
