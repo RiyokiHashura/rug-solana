@@ -5,11 +5,11 @@ const CandlestickChart = ({ isRugPulled, triggerCrash, onPriceChange }) => {
   const [hoverData, setHoverData] = useState(null);
   const [cursorX, setCursorX] = useState(null);
   const chartRef = useRef(null);
-  const width = 800;
+  const width = 600;
   const height = 400;
   const candleWidth = 18;
   const spacing = 2;
-  const maxCandles = 40;
+  const maxCandles = 30;
   const [initialPrice, setInitialPrice] = useState(null);
   const [priceChange, setPriceChange] = useState(0);
   const [basePrice, setBasePrice] = useState(null);
@@ -311,7 +311,7 @@ const CandlestickChart = ({ isRugPulled, triggerCrash, onPriceChange }) => {
 
             {/* Enhanced candles */}
             {candles.map((candle, i) => {
-              const x = width - ((candles.length - i) * (candleWidth + spacing));
+              const x = width - ((candles.length - i) * (candleWidth + spacing)) - 50;
               const isLatest = i === candles.length - 1;
               
               return (
