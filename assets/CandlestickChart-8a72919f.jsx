@@ -121,7 +121,13 @@ const CandlestickChart = ({ isRugPulled, triggerCrash, onPriceChange }) => {
           
           updatePrice(crashCandle.close.toFixed(8), false);
           clearInterval(interval);
-          return [...prev.slice(0, -1), crashCandle];
+
+          // Add delay before showing modal
+          setTimeout(() => {
+            setIsRugPulled(true);
+          }, 1000);
+
+          return [...prev, crashCandle];
         }
 
         const open = lastCandle.close;
